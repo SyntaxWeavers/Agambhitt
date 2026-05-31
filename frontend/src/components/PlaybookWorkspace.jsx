@@ -165,6 +165,52 @@ export function PlaybookWorkspace({ selectedVector, setSelectedVector }) {
             </div>
           </section>
         )}
+
+        {playbook && playbook.cacao_playbook && (
+          <div className="panel-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+            <section className="surface-card">
+              <div className="card-header">
+                <h3 className="card-title app-heading">OASIS CACAO Playbook Specification</h3>
+              </div>
+              <div className="card-body">
+                <pre style={{
+                  background: '#0b1329',
+                  color: '#38bdf8',
+                  padding: '1rem',
+                  overflowX: 'auto',
+                  maxHeight: '25rem',
+                  fontSize: '0.8rem',
+                  fontFamily: 'monospace',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-all'
+                }}>
+                  {JSON.stringify(playbook.cacao_playbook, null, 2)}
+                </pre>
+              </div>
+            </section>
+
+            <section className="surface-card">
+              <div className="card-header">
+                <h3 className="card-title app-heading">Remediation Script</h3>
+              </div>
+              <div className="card-body">
+                <pre style={{
+                  background: '#0b1329',
+                  color: '#10b981',
+                  padding: '1rem',
+                  overflowX: 'auto',
+                  maxHeight: '25rem',
+                  fontSize: '0.8rem',
+                  fontFamily: 'monospace',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-all'
+                }}>
+                  {playbook.remediation_script}
+                </pre>
+              </div>
+            </section>
+          </div>
+        )}
       </div>
     </section>
   )

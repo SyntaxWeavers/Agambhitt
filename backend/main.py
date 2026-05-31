@@ -96,6 +96,8 @@ class PlaybookResponse(BaseModel):
     eradication: List[str]
     recovery: List[str]
     rca: str
+    cacao_playbook: Dict[str, Any]
+    remediation_script: str
 
 class RedTeamRequest(BaseModel):
     topology: Topology
@@ -302,13 +304,37 @@ async def generate_playbook(req: PlaybookRequest, db: Session = Depends(get_db))
     2. Eradication actions (steps to remove the threat root cause, patch, or configure securely)
     3. Recovery actions (restoring systems safely to production)
     4. Root Cause Analysis (RCA) explaining why/how it occurred.
+    5. A valid CACAO 2.0 (OASIS security playbook standard) formatted JSON object under 'cacao_playbook' that outlines the workflow steps and shell commands to perform containment/mitigation.
+    6. An executable shell remediation script (Bash) under 'remediation_script' to automate the containment actions (e.g. using iptables, docker, or systemctl).
     
     Return the response strictly in this JSON format:
     {{
       "containment": ["Step 1", "Step 2"],
       "eradication": ["Step 1", "Step 2"],
       "recovery": ["Step 1", "Step 2"],
-      "rca": "Detailed root cause analysis explanation"
+      "rca": "Detailed root cause analysis explanation",
+      "cacao_playbook": {{
+         "type": "playbook",
+         "spec_version": "cacao-2.0",
+         "id": "playbook--1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+         "name": "Containment Playbook",
+         "description": "CACAO playbook for containment...",
+         "playbook_types": ["mitigation"],
+         "workflow_start": "step--start-uuid",
+         "workflow": {{
+            "step--start-uuid": {{
+               "type": "action",
+               "name": "Firewall Rule",
+               "commands": [
+                  {{
+                     "type": "bash",
+                     "command": "iptables -A INPUT ..."
+                  }}
+               ]
+            }}
+         }}
+      }},
+      "remediation_script": "#!/bin/bash\\n..."
     }}
     """
     
@@ -318,9 +344,11 @@ async def generate_playbook(req: PlaybookRequest, db: Session = Depends(get_db))
             "containment": {"type": "array", "items": {"type": "string"}},
             "eradication": {"type": "array", "items": {"type": "string"}},
             "recovery": {"type": "array", "items": {"type": "string"}},
-            "rca": {"type": "string"}
+            "rca": {"type": "string"},
+            "cacao_playbook": {"type": "object"},
+            "remediation_script": {"type": "string"}
         },
-        "required": ["containment", "eradication", "recovery", "rca"]
+        "required": ["containment", "eradication", "recovery", "rca", "cacao_playbook", "remediation_script"]
     }
     
     llm_res = await call_ollama(prompt, schema)
@@ -329,7 +357,9 @@ async def generate_playbook(req: PlaybookRequest, db: Session = Depends(get_db))
         containment=llm_res.get("containment", []),
         eradication=llm_res.get("eradication", []),
         recovery=llm_res.get("recovery", []),
-        rca=llm_res.get("rca", "")
+        rca=llm_res.get("rca", ""),
+        cacao_playbook=llm_res.get("cacao_playbook", {}),
+        remediation_script=llm_res.get("remediation_script", "")
     )
     
     # Store history
