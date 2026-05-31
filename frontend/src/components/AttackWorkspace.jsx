@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { fetchAnalyze } from '../lib/agambhittApi.js'
 
 export function AttackWorkspace({
@@ -13,6 +13,8 @@ export function AttackWorkspace({
   const [graphEdges, setGraphEdges] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [hoveredVector, setHoveredVector] = useState(null)
+  const [selectedVecId, setSelectedVecId] = useState(null)
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0]
@@ -58,6 +60,57 @@ export function AttackWorkspace({
     }
   }
 
+  // Calculate hierarchical positions for nodes based on their tier:
+  // X = 50 + (5 - tier) * 140
+  // Y = distributed vertically in each tier
+  const nodePositions = useMemo(() => {
+    const positions = {}
+    const tiers = {}
+
+    // Group nodes by tier
+    graphNodes.forEach((node) => {
+      const tier = node.tier ?? 2
+      if (!tiers[tier]) tiers[tier] = []
+      tiers[tier].push(node)
+    });
+
+    const svgWidth = 800
+    const svgHeight = 400
+
+    // Assign positions
+    Object.keys(tiers).forEach((tierStr) => {
+      const tier = parseInt(tierStr, 10)
+      const nodesInTier = tiers[tier]
+      const count = nodesInTier.length
+
+      // X-coord
+      const x = 70 + (5 - tier) * 130
+
+      nodesInTier.forEach((node, index) => {
+        // Y-coord distributed vertically
+        const y = 40 + (index + 0.5) * ((svgHeight - 80) / count)
+        positions[node.id] = { x, y, ...node }
+      })
+    })
+
+    return positions
+  }, [graphNodes])
+
+  // Active path node & link sets for highlighting
+  const activePathDetails = useMemo(() => {
+    const activeVec = hoveredVector ?? attackVectors.find(v => v.vector_id === selectedVecId)
+    if (!activeVec) return { nodes: new Set(), edges: new Set() }
+
+    const path = activeVec.path || []
+    const nodes = new Set(path)
+    const edges = new Set()
+    for (let i = 0; i < path.length - 1; i++) {
+      edges.add(`${path[i]}➔${path[i+1]}`)
+    }
+
+    return { nodes, edges }
+  }, [hoveredVector, selectedVecId, attackVectors])
+
   return (
     <section className="workspace-section dashboard-content">
       <div className="workspace-title-row">
@@ -86,7 +139,7 @@ export function AttackWorkspace({
                   disabled={isLoading}
                   style={{ cursor: 'pointer', background: 'var(--primary)', color: '#fff' }}
                 >
-                  {isLoading ? 'Analyzing...' : 'Run Analysis'}
+                  {isLoading ? 'Analyzing...' : 'Run Analysis ⚡'}
                 </button>
               </div>
             </div>
@@ -117,7 +170,18 @@ export function AttackWorkspace({
               ) : (
                 <div className="vector-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {attackVectors.map((vec, idx) => (
-                    <article key={idx} className="vector-card" style={{ borderLeft: '4px solid var(--danger)' }}>
+                    <article 
+                      key={idx} 
+                      className={`vector-card ${selectedVecId === vec.vector_id ? 'selected' : ''}`} 
+                      style={{ 
+                        borderLeft: selectedVecId === vec.vector_id ? '4px solid #ef4444' : '4px solid var(--danger)',
+                        cursor: 'pointer',
+                        background: selectedVecId === vec.vector_id ? '#fee2e2' : ''
+                      }}
+                      onClick={() => setSelectedVecId(vec.vector_id)}
+                      onMouseEnter={() => setHoveredVector(vec)}
+                      onMouseLeave={() => setHoveredVector(null)}
+                    >
                       <div className="vector-header">
                         <h3 className="vector-title app-heading">{vec.name}</h3>
                         <span className="severity-pill critical">{vec.severity}</span>
@@ -136,7 +200,8 @@ export function AttackWorkspace({
                         <button
                           className="control-chip"
                           style={{ marginLeft: 'auto', background: 'var(--bg-soft)', border: '1px solid #cbd5e1', cursor: 'pointer' }}
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             setSelectedVector(vec)
                             setActiveView('playbook')
                           }}
@@ -152,37 +217,102 @@ export function AttackWorkspace({
           </section>
         </div>
 
-        {/* Path Visualization Panel */}
+        {/* Graphical Path Visualization */}
         {graphNodes.length > 0 && (
           <section className="surface-card">
             <div className="card-header">
-              <h2 className="card-title app-heading">Topology Nodes & Connections</h2>
+              <h2 className="card-title app-heading">Interactive Network Path Visualization</h2>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                Hover/Click predicted attack vectors to trace path flows
+              </div>
             </div>
-            <div className="card-body">
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '0.75rem', maxHeight: '12rem', overflowY: 'auto' }}>
-                {graphNodes.map(node => (
-                  <div key={node.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fff', padding: '0.5rem 0.75rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
-                    <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>
-                      {node.type === 'DB' ? 'database' : node.type === 'External' ? 'public' : 'dns'}
-                    </span>
-                    <div>
-                      <div className="app-heading" style={{ fontSize: '0.9rem', fontWeight: 600 }}>{node.id}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{node.ip || 'no-ip'} (Tier {node.tier})</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginTop: '1rem' }}>
-                <h4 className="app-heading" style={{ fontSize: '0.95rem', marginBottom: '0.5rem' }}>Active Traffic Flows (Total: {graphEdges.length}):</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem', maxHeight: '12rem', overflowY: 'auto' }}>
-                  {graphEdges.map((edge, idx) => (
-                    <div key={idx} style={{ fontSize: '0.8rem', padding: '0.5rem', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '0.25rem' }}>
-                      <strong>{edge.source}</strong> ➔ <strong>{edge.target}</strong>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Protocol: {edge.protocol || 'N/A'} (Port: {edge.port || 'N/A'})</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="card-body" style={{ background: '#0b1329', display: 'flex', justifyContent: 'center', padding: '1.5rem' }}>
+              <svg width="100%" height="400" viewBox="0 0 800 400" style={{ maxWidth: '800px' }}>
+                {/* Connections / Edges */}
+                {graphEdges.map((edge, idx) => {
+                  const srcNode = nodePositions[edge.source]
+                  const dstNode = nodePositions[edge.target]
+                  if (!srcNode || !dstNode) return null
+
+                  const isPathHighlighted = activePathDetails.edges.has(`${edge.source}➔${edge.target}`)
+
+                  return (
+                    <g key={idx}>
+                      <line
+                        x1={srcNode.x}
+                        y1={srcNode.y}
+                        x2={dstNode.x}
+                        y2={dstNode.y}
+                        stroke={isPathHighlighted ? '#ef4444' : 'rgba(255, 255, 255, 0.15)'}
+                        strokeWidth={isPathHighlighted ? 3 : 1.5}
+                        strokeDasharray={isPathHighlighted ? '6,6' : 'none'}
+                        style={{
+                          transition: 'stroke 0.2s, stroke-width 0.2s',
+                          animation: isPathHighlighted ? 'dash-move 20s linear infinite' : 'none'
+                        }}
+                      />
+                    </g>
+                  )
+                })}
+
+                {/* Nodes */}
+                {Object.values(nodePositions).map((node) => {
+                  const isNodeHighlighted = activePathDetails.nodes.has(node.id)
+                  
+                  // Color codes
+                  let fill = '#38bdf8' // Default (Microservice, Portal)
+                  if (node.type === 'DB') fill = '#10b981' // Secure target
+                  if (node.type === 'External') fill = '#ef4444' // Aggressor
+
+                  return (
+                    <g 
+                      key={node.id} 
+                      transform={`translate(${node.x}, ${node.y})`}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <circle
+                        r={isNodeHighlighted ? 22 : 18}
+                        fill="#0b1329"
+                        stroke={isNodeHighlighted ? '#ef4444' : fill}
+                        strokeWidth={isNodeHighlighted ? 3 : 2}
+                        style={{ transition: 'r 0.2s, stroke 0.2s, stroke-width 0.2s' }}
+                      />
+                      <text
+                        y={32}
+                        textAnchor="middle"
+                        fill={isNodeHighlighted ? '#ef4444' : '#f8fafc'}
+                        style={{
+                          fontFamily: 'var(--body-font)',
+                          fontSize: '0.75rem',
+                          fontWeight: isNodeHighlighted ? 'bold' : 'normal',
+                          pointerEvents: 'none'
+                        }}
+                      >
+                        {node.id}
+                      </text>
+                      <text
+                        textAnchor="middle"
+                        y={4}
+                        fill="#fff"
+                        style={{
+                          fontFamily: 'Material Symbols Outlined',
+                          fontSize: '1rem',
+                          pointerEvents: 'none'
+                        }}
+                      >
+                        {node.type === 'DB' ? 'database' : node.type === 'External' ? 'public' : 'dns'}
+                      </text>
+                    </g>
+                  )
+                })}
+              </svg>
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes dash-move {
+                  to {
+                    stroke-dashoffset: -1000px;
+                  }
+                }
+              `}} />
             </div>
           </section>
         )}

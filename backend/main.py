@@ -183,31 +183,15 @@ async def analyze_topology(req: AnalyzeRequest, db: Session = Depends(get_db)):
     for edge in req.topology.edges:
         G.add_edge(edge.src, edge.dst, protocol=edge.protocol, port=edge.port)
 
-    # Simple heuristic path generation for context (nodes of tier 5/external to tier 0/DB)
-    external_nodes = [n for n, attr in G.nodes(data=True) if attr.get("type") == "External" or attr.get("tier") == 5]
-    db_nodes = [n for n, attr in G.nodes(data=True) if attr.get("type") == "DB" or attr.get("tier") == 0]
-    
+    # More comprehensive path search covering lateral movements, insider threat origins, and intermediate systems
     potential_paths = []
-    if external_nodes and db_nodes:
-        for src in external_nodes:
-            for dst in db_nodes:
+    nodes_list = list(G.nodes())
+    for src in nodes_list:
+        for dst in nodes_list:
+            if src != dst:
                 try:
-                    # Find simple paths up to cutoff length 4
+                    # Find paths with a max cutoff of 4
                     paths = list(nx.all_simple_paths(G, source=src, target=dst, cutoff=4))
-                    for path in paths[:5]:
-                        potential_paths.append(path)
-                except Exception:
-                    pass
-
-    # Fallback if no specific paths found: just list nodes/edges and look for short connectivity patterns
-    if not potential_paths:
-        # Get paths from users or web servers to internal apps
-        user_nodes = [n for n, attr in G.nodes(data=True) if attr.get("type") == "User"]
-        app_nodes = [n for n, attr in G.nodes(data=True) if attr.get("type") == "AppServer"]
-        for src in user_nodes:
-            for dst in app_nodes:
-                try:
-                    paths = list(nx.all_simple_paths(G, source=src, target=dst, cutoff=3))
                     for path in paths[:3]:
                         potential_paths.append(path)
                 except Exception:
@@ -216,8 +200,8 @@ async def analyze_topology(req: AnalyzeRequest, db: Session = Depends(get_db)):
     # Build prompt context
     topology_summary = {
         "nodes": [{"id": n, "type": G.nodes[n].get("type"), "tier": G.nodes[n].get("tier"), "ip": G.nodes[n].get("ip")} for n in G.nodes()],
-        "edges": [{"src": u, "dst": v} for u, v in G.edges()],
-        "extracted_sample_paths": potential_paths[:10]
+        "edges": [{"src": u, "dst": v, "protocol": G.edges[u, v].get("protocol"), "port": G.edges[u, v].get("port")} for u, v in G.edges()],
+        "extracted_sample_paths": potential_paths[:40]
     }
     
     prompt = f"""
@@ -233,6 +217,9 @@ async def analyze_topology(req: AnalyzeRequest, db: Session = Depends(get_db)):
     {json.dumps([i.model_dump() for i in req.historical_incidents], indent=2)}
     
     Identify potential attack vectors (ranked by severity, high to low), detailing the exact path (list of node IDs), severity (Critical, High, Medium, Low), likelihood (High, Medium, Low), estimated business impact, corresponding MITRE ATT&CK mapping tags (e.g. T1190, T1078), and a descriptive summary.
+    
+    CRITICAL: You must detect lateral movement paths (e.g., intermediate Microservices, AppServers, DBs talking to each other) and insider threats starting from internal User or Admin Panel tiers, not just paths originating from external sources.
+    
     
     Return the result strictly conforming to this JSON format:
     {{

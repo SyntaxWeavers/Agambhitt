@@ -1,0 +1,1078 @@
+{
+  "nodes": [
+    {
+      "id": "DB_Core_Banking",
+      "type": "DB",
+      "tier": 0,
+      "ip": "10.0.0.5"
+    },
+    {
+      "id": "DB_User_Credentials",
+      "type": "DB",
+      "tier": 0,
+      "ip": "10.0.0.6"
+    },
+    {
+      "id": "AppServer_Loans_01",
+      "type": "AppServer",
+      "tier": 2,
+      "ip": "10.0.1.45"
+    },
+    {
+      "id": "AppServer_Portal",
+      "type": "AppServer",
+      "tier": 2,
+      "ip": "10.0.1.46"
+    },
+    {
+      "id": "MicroService_PaymentGateway",
+      "type": "MicroService",
+      "tier": 1,
+      "ip": "10.0.2.10"
+    },
+    {
+      "id": "MicroService_SWIFT_Engine",
+      "type": "MicroService",
+      "tier": 1,
+      "ip": "10.0.2.11"
+    },
+    {
+      "id": "AdminPanel_Core",
+      "type": "AdminPanel",
+      "tier": 3,
+      "ip": "10.0.3.1"
+    },
+    {
+      "id": "User_Rahul",
+      "type": "User",
+      "tier": 4,
+      "ip": "192.168.10.12"
+    },
+    {
+      "id": "User_Priya",
+      "type": "User",
+      "tier": 4,
+      "ip": "192.168.10.13"
+    },
+    {
+      "id": "User_Amit",
+      "type": "User",
+      "tier": 4,
+      "ip": "192.168.10.14"
+    },
+    {
+      "id": "User_Sneha",
+      "type": "User",
+      "tier": 4,
+      "ip": "192.168.10.15"
+    },
+    {
+      "id": "External_Malicious_C2",
+      "type": "External",
+      "tier": 5,
+      "ip": "185.220.101.5"
+    }
+  ],
+  "edges": [
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748621451,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 568,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748621490,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 7747,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748621515,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 4832,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748621559,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 2053,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748621568,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 6215,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748621582,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3477,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748621637,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 4174,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748621689,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2788,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748621719,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 10239,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748621744,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3426,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748621779,
+      "protocol": "TCP",
+      "port": 22,
+      "bytes": 767229907,
+      "method": "CONNECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748621794,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 4919,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748621825,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 9300,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748621848,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1926,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748621895,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 4935,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748621916,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 8913,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748621954,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 10888,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748621978,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 14338,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622019,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 7504,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622039,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2463,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622063,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 787,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622112,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 5310,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748622150,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2105,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622155,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 10212,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748622187,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 13351,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622192,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1359,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622200,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3743,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622226,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1536,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748622277,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 8328,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748622295,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1564,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622320,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 11607,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748622350,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 4182,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748622388,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3320,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622412,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 14272,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748622468,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 12184,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748622517,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 5674,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622574,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 6716,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748622595,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3534,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622600,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3792,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622612,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 14305,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748622648,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 6843,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622701,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2916,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622722,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 11515,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748622766,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 9771,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748622797,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2521,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748622838,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 11456,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748622884,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3862,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622935,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 4070,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748622954,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 3294,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622959,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1964,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748622973,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3490,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748622981,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2594,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748623038,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2050,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748623059,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3730,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748623110,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 6742,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748623168,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 4508,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748623214,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 4319,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748623224,
+      "protocol": "TCP",
+      "port": 443,
+      "bytes": 118542330,
+      "method": "CONNECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748623243,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2152,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748623275,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 519,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748623327,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 2807,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748623349,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 3444,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748623402,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1164,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748623416,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 4922,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748623465,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 985,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748623485,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 7149,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748623538,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 3151,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748623564,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1602,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748623621,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 12494,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748623648,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2886,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Rahul",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748623672,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2616,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748623717,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1399,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748623759,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2780,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748623779,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 2773,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748623825,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 5150,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748623857,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 7719,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748623895,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 7068,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748623928,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 9417,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748623988,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 7365,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748624027,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1645,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748624071,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 9674,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748624123,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 4756,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "External_Malicious_C2",
+      "timestamp": 1748624137,
+      "protocol": "SSH",
+      "port": 22,
+      "bytes": 454237018,
+      "method": "CONNECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748624160,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 12683,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748624202,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 5007,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748624262,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 9618,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748624277,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 10822,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748624329,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 9889,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748624347,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 13059,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748624367,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 6786,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748624404,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2509,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Amit",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748624432,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 904,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748624437,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 4673,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Portal",
+      "timestamp": 1748624490,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 1888,
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "src": "User_Sneha",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748624511,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 2777,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "User_Priya",
+      "dst": "AppServer_Loans_01",
+      "timestamp": 1748624524,
+      "protocol": "HTTPS",
+      "port": 443,
+      "bytes": 689,
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748624557,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 4300,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748624611,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 6850,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Loans_01",
+      "dst": "DB_Core_Banking",
+      "timestamp": 1748624631,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 9736,
+      "method": "SELECT",
+      "status": 200
+    },
+    {
+      "src": "AppServer_Portal",
+      "dst": "DB_User_Credentials",
+      "timestamp": 1748624665,
+      "protocol": "SQL",
+      "port": 5432,
+      "bytes": 9944,
+      "method": "SELECT",
+      "status": 200
+    }
+  ]
+}
