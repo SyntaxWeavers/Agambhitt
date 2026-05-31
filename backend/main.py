@@ -98,6 +98,7 @@ class PlaybookResponse(BaseModel):
     rca: str
     cacao_playbook: Dict[str, Any]
     remediation_script: str
+    script_risks: List[str]
 
 class RedTeamRequest(BaseModel):
     topology: Topology
@@ -334,7 +335,8 @@ async def generate_playbook(req: PlaybookRequest, db: Session = Depends(get_db))
             }}
          }}
       }},
-      "remediation_script": "#!/bin/bash\\n..."
+      "remediation_script": "#!/bin/bash\\n...",
+      "script_risks": ["Risk 1: Potential downtime of services", "Risk 2: Potential database lock"]
     }}
     """
     
@@ -346,9 +348,10 @@ async def generate_playbook(req: PlaybookRequest, db: Session = Depends(get_db))
             "recovery": {"type": "array", "items": {"type": "string"}},
             "rca": {"type": "string"},
             "cacao_playbook": {"type": "object"},
-            "remediation_script": {"type": "string"}
+            "remediation_script": {"type": "string"},
+            "script_risks": {"type": "array", "items": {"type": "string"}}
         },
-        "required": ["containment", "eradication", "recovery", "rca", "cacao_playbook", "remediation_script"]
+        "required": ["containment", "eradication", "recovery", "rca", "cacao_playbook", "remediation_script", "script_risks"]
     }
     
     llm_res = await call_ollama(prompt, schema)
@@ -359,7 +362,8 @@ async def generate_playbook(req: PlaybookRequest, db: Session = Depends(get_db))
         recovery=llm_res.get("recovery", []),
         rca=llm_res.get("rca", ""),
         cacao_playbook=llm_res.get("cacao_playbook", {}),
-        remediation_script=llm_res.get("remediation_script", "")
+        remediation_script=llm_res.get("remediation_script", ""),
+        script_risks=llm_res.get("script_risks", [])
     )
     
     # Store history

@@ -211,6 +211,22 @@ export function PlaybookWorkspace({ selectedVector, setSelectedVector }) {
             </section>
           </div>
         )}
+        {playbook && playbook.script_risks && playbook.script_risks.length > 0 && (
+          <section className="surface-card" style={{ borderLeft: '4px solid #ef4444' }}>
+            <div className="card-header">
+              <h3 className="card-title app-heading" style={{ color: '#ef4444' }}>Script Execution Risks & Destructive Impact</h3>
+            </div>
+            <div className="card-body">
+              <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', margin: 0 }}>
+                {playbook.script_risks.map((risk, idx) => (
+                  <li key={idx} style={{ fontSize: '0.85rem', color: 'var(--text-strong)', lineHeight: 1.4 }}>
+                    {risk}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
       </div>
     </section>
   )

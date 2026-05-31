@@ -78,6 +78,7 @@ class TestAgamBhittBackend(unittest.TestCase):
         self.assertIn("rca", playbook_data)
         self.assertIn("cacao_playbook", playbook_data)
         self.assertIn("remediation_script", playbook_data)
+        self.assertIn("script_risks", playbook_data)
 
         # 3. Red Team simulation
         redteam_req = {
