@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+:root {
+  --bg-soft: #eef5ff;
+  --surface: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.78);
+  --text-strong: #0f1f33;
+  --text-muted: #54637b;
+  --sidebar-width: 18rem;
+  --heading-font: 'Hanken Grotesk', sans-serif;
+  --body-font: 'Hanken Grotesk', sans-serif;
+  --mono-font: 'JetBrains Mono', monospace;
+
+  font-family: var(--body-font);
+  color: var(--text-strong);
+  background: var(--bg-soft);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--bg-soft);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+textarea {
+  font-family: var(--mono-font);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.app-heading {
+  font-family: var(--heading-font);
+  letter-spacing: -0.04em;
+}
