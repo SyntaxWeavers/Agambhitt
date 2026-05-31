@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { fetchCountermeasures } from '../lib/agambhittApi.js'
 
-export function CountermeasuresWorkspace({ attackChain }) {
-  const [countermeasures, setCountermeasures] = useState([])
+export function CountermeasuresWorkspace({
+  attackChain,
+  countermeasures,
+  setCountermeasures
+}) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -27,7 +30,7 @@ export function CountermeasuresWorkspace({ attackChain }) {
   }
 
   useEffect(() => {
-    if (attackChain.length > 0) {
+    if (attackChain.length > 0 && countermeasures.length === 0) {
       void Promise.resolve().then(() => handleGenerate())
     }
   }, [attackChain])

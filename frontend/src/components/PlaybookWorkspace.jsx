@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { fetchPlaybook } from '../lib/agambhittApi.js'
 
-export function PlaybookWorkspace({ selectedVector, setSelectedVector }) {
-  const [incidentDesc, setIncidentDesc] = useState(
-    'Detected abnormal outbound activity mimicking the predicted attack sequence.'
-  )
-  const [playbook, setPlaybook] = useState(null)
+export function PlaybookWorkspace({
+  selectedVector,
+  setSelectedVector,
+  incidentDesc,
+  setIncidentDesc,
+  playbook,
+  setPlaybook
+}) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -30,12 +33,12 @@ export function PlaybookWorkspace({ selectedVector, setSelectedVector }) {
     }
   }
 
-  // Pre-populate response if new vector is selected
+  // Clear current playbook output if a new vector is chosen
   useEffect(() => {
     if (selectedVector) {
       setPlaybook(null)
     }
-  }, [selectedVector])
+  }, [selectedVector, setPlaybook])
 
   return (
     <section className="workspace-section dashboard-content">
@@ -211,6 +214,7 @@ export function PlaybookWorkspace({ selectedVector, setSelectedVector }) {
             </section>
           </div>
         )}
+
         {playbook && playbook.script_risks && playbook.script_risks.length > 0 && (
           <section className="surface-card" style={{ borderLeft: '4px solid #ef4444' }}>
             <div className="card-header">

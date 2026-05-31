@@ -1,20 +1,25 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { fetchAnalyze } from '../lib/agambhittApi.js'
 
 export function AttackWorkspace({
   topology,
   setTopology,
+  topologyStr,
+  setTopologyStr,
+  attackVectors,
+  setAttackVectors,
+  graphNodes,
+  setGraphNodes,
+  graphEdges,
+  setGraphEdges,
+  selectedVecId,
+  setSelectedVecId,
   setSelectedVector,
   setActiveView
 }) {
-  const [topologyStr, setTopologyStr] = useState(JSON.stringify(topology, null, 2))
-  const [attackVectors, setAttackVectors] = useState([])
-  const [graphNodes, setGraphNodes] = useState([])
-  const [graphEdges, setGraphEdges] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [hoveredVector, setHoveredVector] = useState(null)
-  const [selectedVecId, setSelectedVecId] = useState(null)
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0]
@@ -61,8 +66,6 @@ export function AttackWorkspace({
   }
 
   // Calculate hierarchical positions for nodes based on their tier:
-  // X = 50 + (5 - tier) * 140
-  // Y = distributed vertically in each tier
   const nodePositions = useMemo(() => {
     const positions = {}
     const tiers = {}
