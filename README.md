@@ -4,7 +4,7 @@
 
 ---
 
-## 🛡️ Tri-Layered Defense Architecture
+## Tri-Layered Defense Architecture
 
 1. **The Wall (Contextual WAF):** An inline, Transformer-based Web Application Firewall (RoBERTa/DistilBERT) analyzing the semantic intent of requests to block zero-day exploits and polymorphic payloads.
 2. **The Eyes (Predictive Graph Intelligence):** A Graph Neural Network (GNN) mapping users, configurations, and permissions into a Heterogeneous Graph to identify hidden lateral threat paths.
@@ -12,7 +12,7 @@
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 * **Frontend:** React + Vite, Tailwind CSS, Interactive Network Topology Graph
 * **Backend API:** FastAPI, SQLAlchemy, NetworkX, Uvicorn
@@ -22,7 +22,7 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Prerequisites
 Ensure you have Python 3.12+, Node.js (v18+), and Ollama running locally.
@@ -50,7 +50,7 @@ Open `http://localhost:5173` to access the interactive dashboard.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 * `/frontend` — React dashboard and attack topology viewer
 * `/backend` — FastAPI server, local LLM integrations, and audit logs database
