@@ -1,125 +1,55 @@
-import { useCallback, useEffect, useState } from 'react'
-import { attackPathNodes, attackVectors, topologyJson, workspaceHighlights } from '../data/dashboardData.js'
-import {
-  fetchAnalyze,
-  fetchCountermeasures,
-  normalizeAnalyzeResponse,
-} from '../lib/agambhittApi.js'
+import { useState } from 'react'
+import { fetchAnalyze } from '../lib/agambhittApi.js'
 
-function SectionCard({ icon, title, action, children }) {
-  return (
-    <section className="surface-card">
-      <div className="card-header">
-        <div className="badge-row">
-          <span className={`icon-badge ${icon.tone ?? ''}`.trim()} aria-hidden="true">
-            <span className="material-symbols-outlined inline-icon">{icon.name}</span>
-          </span>
-          <h2 className="card-title app-heading">{title}</h2>
-        </div>
-
-        {action}
-      </div>
-
-      <div className="card-body">{children}</div>
-    </section>
-  )
-}
-
-function AttackVectorCard({ vector }) {
-  return (
-    <article className={`vector-card${vector.muted ? ' is-muted' : ''}`}>
-      <div className="vector-header">
-        <h3 className="vector-title app-heading">{vector.title}</h3>
-        <span className={`severity-pill ${vector.tone}`}>{vector.severity}</span>
-      </div>
-
-      <p className="vector-desc">{vector.description}</p>
-
-      {vector.path ? (
-        <div className="vector-meta">
-          <div className="avatar-stack" aria-hidden="true">
-            {(vector.actors ?? []).map((actor) => (
-              <div className="avatar" key={actor}>
-                {actor}
-              </div>
-            ))}
-          </div>
-          <span className="meta-copy app-heading">{vector.path}</span>
-        </div>
-      ) : null}
-    </article>
-  )
-}
-
-function PathNode({ node }) {
-  return (
-    <div className="path-node">
-      <div className={`node-circle is-${node.tone}`}>
-        <span className={`material-symbols-outlined ${node.tone === 'primary' ? 'text-primary' : ''}`} aria-hidden="true">
-          {node.icon}
-        </span>
-      </div>
-      <span className="label-copy app-heading">{node.label}</span>
-    </div>
-  )
-}
-
-export function AttackWorkspace() {
-  const [topologyInput, setTopologyInput] = useState(topologyJson)
-  const [analysis, setAnalysis] = useState(null)
-  const [countermeasures, setCountermeasures] = useState([])
+export function AttackWorkspace({
+  topology,
+  setTopology,
+  vulnerabilities,
+  setVulnerabilities,
+  incidents,
+  setIncidents,
+  setSelectedVector,
+  setActiveView
+}) {
+  const [topologyStr, setTopologyStr] = useState(JSON.stringify(topology, null, 2))
+  const [vulnStr, setVulnStr] = useState(JSON.stringify(vulnerabilities, null, 2))
+  const [incidentsStr, setIncidentsStr] = useState(JSON.stringify(incidents, null, 2))
+  
+  const [attackVectors, setAttackVectors] = useState([])
+  const [graphNodes, setGraphNodes] = useState([])
+  const [graphEdges, setGraphEdges] = useState([])
+  
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const runAnalysis = useCallback(
-    async (input = topologyInput) => {
-      let parsedTopology
+  const handleAnalyze = async () => {
+    setIsLoading(true)
+    setError('')
+    try {
+      const parsedTopology = JSON.parse(topologyStr)
+      const parsedVulns = JSON.parse(vulnStr)
+      const parsedIncidents = JSON.parse(incidentsStr)
 
-      try {
-        parsedTopology = JSON.parse(input)
-      } catch {
-        setError('Topology JSON is invalid.')
-        return
-      }
+      // Save to parent state for sharing
+      setTopology(parsedTopology)
+      setVulnerabilities(parsedVulns)
+      setIncidents(parsedIncidents)
 
-      setIsLoading(true)
-      setError('')
+      const result = await fetchAnalyze({
+        topology: parsedTopology,
+        vulnerabilities: parsedVulns,
+        historical_incidents: parsedIncidents,
+      })
 
-      try {
-        const analyzeResponse = await fetchAnalyze({ topology: parsedTopology })
-        const normalizedAnalyze = normalizeAnalyzeResponse(analyzeResponse)
-        setAnalysis(normalizedAnalyze)
-
-        const counterResponse = await fetchCountermeasures({
-          topology: parsedTopology,
-          analysis: analyzeResponse,
-        })
-        const normalizedCountermeasures = normalizeAnalyzeResponse(counterResponse)
-        setCountermeasures(normalizedCountermeasures.countermeasures)
-      } catch (requestError) {
-        setError(requestError instanceof Error ? requestError.message : 'Unable to analyze topology.')
-        setAnalysis(null)
-        setCountermeasures([])
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [topologyInput],
-  )
-
-  useEffect(() => {
-    void Promise.resolve().then(() => runAnalysis(topologyJson))
-  }, [runAnalysis])
-
-  const vectors = analysis?.vectors.length ? analysis.vectors : attackVectors
-  const pathNodes = analysis?.pathNodes.length ? analysis.pathNodes : attackPathNodes
-  const controls = countermeasures.length
-    ? countermeasures
-    : [
-        { title: 'Network Segmentation', description: 'Segment exposed web and database tiers.' },
-        { title: 'Credential Reset', description: 'Rotate privileged credentials and invalidate active sessions.' },
-        { title: 'Firewall Review', description: 'Block suspicious egress paths at the edge firewall.' },
-      ]
+      setAttackVectors(result.attack_vectors || [])
+      setGraphNodes(result.graph_nodes || [])
+      setGraphEdges(result.graph_edges || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Analysis failed')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <section className="workspace-section dashboard-content">
@@ -127,106 +57,142 @@ export function AttackWorkspace() {
         <div>
           <h1 className="section-heading app-heading">Attack Predictor</h1>
           <p className="section-subtitle">
-            {analysis?.summary || 'Predictive detection for likely attack chains across exposed assets.'}
+            Analyze network topology and vulnerabilities using NetworkX and granite4.1:3b.
           </p>
         </div>
-
-        <p className="workspace-tag">{workspaceHighlights[0].title}</p>
       </div>
 
       <div className="dashboard-grid">
+        {/* Input Forms */}
         <div className="panel-grid">
-          <SectionCard
-            icon={{ name: 'data_object', tone: 'is-secondary' }}
-            title="Network Topology Data"
-            action={
-              <div className="badge-row" style={{ gap: '0.5rem' }}>
-                <button className="control-chip" type="button">
-                  Import JSON
-                </button>
-                <button className="control-chip" type="button" onClick={() => runAnalysis()}>
-                  {isLoading ? 'Analyzing...' : 'Analyze'}
-                </button>
-              </div>
-            }
-          >
-            <textarea
-              className="text-editor"
-              onChange={(event) => setTopologyInput(event.target.value)}
-              spellCheck="false"
-              value={topologyInput}
-            />
-            {error ? <p className="path-note" style={{ color: '#b91c1c' }}>{error}</p> : null}
-          </SectionCard>
-
-          <SectionCard
-            icon={{ name: 'warning', tone: 'is-danger' }}
-            title="Ranked Attack Vectors"
-            action={<span className="count-pill">{vectors.length} Findings</span>}
-          >
-            <div className="vector-list">
-              {vectors.map((vector) => (
-                <AttackVectorCard key={vector.title} vector={vector} />
-              ))}
+          <section className="surface-card">
+            <div className="card-header">
+              <h2 className="card-title app-heading">Network Configuration</h2>
+              <button 
+                className="control-chip" 
+                onClick={handleAnalyze} 
+                disabled={isLoading}
+                style={{ cursor: 'pointer', background: 'var(--primary)', color: '#fff' }}
+              >
+                {isLoading ? 'Analyzing...' : 'Run Analysis ⚡'}
+              </button>
             </div>
-          </SectionCard>
+            <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label className="small-label">Topology JSON</label>
+                <textarea
+                  className="text-editor"
+                  style={{ minHeight: '10rem', fontFamily: 'monospace', fontSize: '0.85rem' }}
+                  value={topologyStr}
+                  onChange={(e) => setTopologyStr(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="small-label">Vulnerabilities JSON</label>
+                <textarea
+                  className="text-editor"
+                  style={{ minHeight: '8rem', fontFamily: 'monospace', fontSize: '0.85rem' }}
+                  value={vulnStr}
+                  onChange={(e) => setVulnStr(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="small-label">Incidents JSON</label>
+                <textarea
+                  className="text-editor"
+                  style={{ minHeight: '6rem', fontFamily: 'monospace', fontSize: '0.85rem' }}
+                  value={incidentsStr}
+                  onChange={(e) => setIncidentsStr(e.target.value)}
+                />
+              </div>
+              {error && <p style={{ color: 'var(--danger)', margin: 0 }}>{error}</p>}
+            </div>
+          </section>
+
+          {/* Results List */}
+          <section className="surface-card">
+            <div className="card-header">
+              <h2 className="card-title app-heading">Predicted Attack Vectors</h2>
+              <span className="count-pill">{attackVectors.length} Found</span>
+            </div>
+            <div className="card-body" style={{ overflowY: 'auto', maxHeight: '42rem' }}>
+              {attackVectors.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '3rem' }}>shield</span>
+                  <p>No attack vectors predicted yet. Configure inputs and run analysis.</p>
+                </div>
+              ) : (
+                <div className="vector-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {attackVectors.map((vec, idx) => (
+                    <article key={idx} className="vector-card" style={{ borderLeft: '4px solid var(--danger)' }}>
+                      <div className="vector-header">
+                        <h3 className="vector-title app-heading">{vec.name}</h3>
+                        <span className="severity-pill critical">{vec.severity}</span>
+                      </div>
+                      <p className="vector-desc">{vec.description}</p>
+                      <div style={{ fontSize: '0.85rem', margin: '0.5rem 0' }}>
+                        <strong>Likelihood:</strong> {vec.likelihood} | <strong>Impact:</strong> {vec.business_impact}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', margin: '0.5rem 0' }}>
+                        {vec.mitre_attack_mappings.map(tag => (
+                          <span key={tag} className="tag-chip" style={{ background: '#fee2e2', color: '#b91c1c', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>{tag}</span>
+                        ))}
+                      </div>
+                      <div className="vector-meta" style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', marginTop: '0.5rem' }}>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Path: {vec.path.join(' ➔ ')}</span>
+                        <button
+                          className="control-chip"
+                          style={{ marginLeft: 'auto', background: 'var(--bg-soft)', border: '1px solid #cbd5e1', cursor: 'pointer' }}
+                          onClick={() => {
+                            setSelectedVector(vec)
+                            setActiveView('playbook')
+                          }}
+                        >
+                          Generate Playbook ➔
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
         </div>
 
-        <SectionCard
-          icon={{ name: 'hub', tone: 'is-secondary' }}
-          title="Predicted Attack Path Visualization"
-          action={
-            <div className="path-legend">
-              <div className="legend-item">
-                <span className="legend-dot is-danger" aria-hidden="true" />
-                <span className="small-label">Exploited</span>
+        {/* Path Visualization Panel */}
+        {graphNodes.length > 0 && (
+          <section className="surface-card">
+            <div className="card-header">
+              <h2 className="card-title app-heading">Topology Connections & Paths</h2>
+            </div>
+            <div className="card-body">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '0.75rem' }}>
+                {graphNodes.map(node => (
+                  <div key={node.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fff', padding: '0.5rem 0.75rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                    <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>
+                      {node.type === 'DB' ? 'database' : node.type === 'External' ? 'public' : 'dns'}
+                    </span>
+                    <div>
+                      <div className="app-heading" style={{ fontSize: '0.9rem', fontWeight: 600 }}>{node.id}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{node.ip || 'no-ip'} (Tier {node.tier})</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="legend-item">
-                <span className="legend-dot is-primary" aria-hidden="true" />
-                <span className="small-label">Target</span>
+              <div style={{ marginTop: '1rem' }}>
+                <h4 className="app-heading" style={{ fontSize: '0.95rem', marginBottom: '0.5rem' }}>Active Traffic Flows:</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                  {graphEdges.map((edge, idx) => (
+                    <div key={idx} style={{ fontSize: '0.8rem', padding: '0.5rem', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '0.25rem' }}>
+                      <strong>{edge.source}</strong> ➔ <strong>{edge.target}</strong>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Protocol: {edge.protocol || 'N/A'} (Port: {edge.port || 'N/A'})</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          }
-        >
-          <div className="path-board">
-            <div className="decor-dots" aria-hidden="true" />
-
-            <div className="path-grid">
-              {pathNodes.map((node, index) => (
-                <>
-                  <PathNode key={node.label} node={node} />
-
-                  {index < pathNodes.length - 1 ? (
-                    <div
-                      className={`path-link${index === 0 ? ' is-animated' : ''}${index === 1 ? ' is-accent' : ''}${index === 2 ? ' is-dashed' : ''}`}
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                </>
-              ))}
-            </div>
-
-            <p className="path-note app-heading">
-              {analysis?.summary ||
-                'The active chain begins at the external actor, pivots through the web tier, and reaches the database before exfiltration.'}
-            </p>
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          icon={{ name: 'shield', tone: 'is-secondary' }}
-          title="Countermeasures"
-          action={<span className="count-pill">{controls.length} Controls</span>}
-        >
-          <div className="vector-list">
-            {controls.map((control) => (
-              <article className="vector-card" key={control.title}>
-                <h3 className="vector-title app-heading">{control.title}</h3>
-                <p className="vector-desc">{control.description}</p>
-              </article>
-            ))}
-          </div>
-        </SectionCard>
+          </section>
+        )}
       </div>
     </section>
   )

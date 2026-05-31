@@ -1,278 +1,107 @@
-import { useCallback, useEffect, useState } from 'react'
-import {
-  redTeamControls,
-  redTeamLogLines,
-  redTeamMetrics,
-  redTeamPath,
-  redTeamTimeline,
-} from '../data/dashboardData.js'
-import { fetchRedTeam, normalizeRedTeamResponse } from '../lib/agambhittApi.js'
+import { useState } from 'react'
+import { fetchRedTeam } from '../lib/agambhittApi.js'
 
-function SectionCard({ icon, title, action, children, className = '' }) {
-  return (
-    <section className={`surface-card ${className}`.trim()}>
-      <div className="card-header">
-        <div className="badge-row">
-          <span className={`icon-badge ${icon.tone ?? ''}`.trim()} aria-hidden="true">
-            <span className="material-symbols-outlined inline-icon">{icon.name}</span>
-          </span>
-          <h2 className="card-title app-heading">{title}</h2>
-        </div>
-
-        {action}
-      </div>
-
-      <div className="card-body">{children}</div>
-    </section>
-  )
-}
-
-function MetricBar({ label, value, tone }) {
-  return (
-    <div>
-      <div className="metric-row">
-        <span className="metric-label app-heading">{label}</span>
-        <span className={`metric-value ${tone}`}>{value}</span>
-      </div>
-      <div className="metric-track">
-        <div className={`metric-fill ${tone}`} style={{ width: value }} />
-      </div>
-    </div>
-  )
-}
-
-function TimelineItem({ item }) {
-  return (
-    <div className={`timeline-item is-${item.tone}`}>
-      <div className="timeline-marker" />
-      <div className="timeline-grid">
-        <article className="timeline-card is-attack">
-          <div className="timeline-head">
-            <span className={`timeline-tag is-${item.tone}`}>{item.phase}</span>
-            <span className="timeline-time">{item.time}</span>
-          </div>
-          <h3 className="timeline-title app-heading">{item.attackTitle}</h3>
-          <p className="timeline-copy">{item.attackBody}</p>
-        </article>
-
-        <article className={`timeline-card is-defense is-${item.defenseTone}`}>
-          <div className="timeline-head">
-            <span className={`timeline-tag is-${item.defenseTone}`}>DETECTION</span>
-            <span className="material-symbols-outlined timeline-icon" aria-hidden="true">
-              {item.defenseTone === 'error' ? 'warning' : 'verified'}
-            </span>
-          </div>
-          <h3 className="timeline-title app-heading">{item.defenseTitle}</h3>
-          <p className="timeline-copy">{item.defenseBody}</p>
-        </article>
-      </div>
-    </div>
-  )
-}
-
-function PathNode({ node }) {
-  return (
-    <div className="redteam-node">
-      <div className={`redteam-node-circle is-${node.tone}`}>
-        <span className="material-symbols-outlined" aria-hidden="true">
-          {node.icon}
-        </span>
-        <span className="redteam-node-status">{node.status}</span>
-      </div>
-      <span className="redteam-node-label app-heading">{node.label}</span>
-    </div>
-  )
-}
-
-export function RedTeamWorkspace() {
-  const [simulation, setSimulation] = useState(null)
-  const [actorProfile, setActorProfile] = useState(redTeamControls[0].value)
-  const [attackVelocity, setAttackVelocity] = useState(72)
-  const [autoGeneratePlaybook, setAutoGeneratePlaybook] = useState(true)
+export function RedTeamWorkspace({
+  topology,
+  vulnerabilities,
+  setAttackChain,
+  setActiveView
+}) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [chain, setChain] = useState([])
 
-  const runSimulation = useCallback(async () => {
+  const handleSimulate = async () => {
     setIsLoading(true)
     setError('')
-
     try {
       const response = await fetchRedTeam({
-        threat_actor_profile: actorProfile,
-        attack_velocity: attackVelocity,
-        auto_generate_playbook: autoGeneratePlaybook,
+        topology: topology,
+        vulnerabilities: vulnerabilities
       })
-      setSimulation(normalizeRedTeamResponse(response))
-    } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Unable to load red team simulation.')
-      setSimulation(null)
+      setChain(response.attack_chain || [])
+      setAttackChain(response.attack_chain || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Simulation failed')
     } finally {
       setIsLoading(false)
     }
-  }, [actorProfile, attackVelocity, autoGeneratePlaybook])
-
-  useEffect(() => {
-    void Promise.resolve().then(() => runSimulation())
-  }, [runSimulation])
-
-  const simulationData = simulation ?? {
-    sessionTitle: 'Operation Golden Eye',
-    ttr: '14m 22s',
-    topologyNodes: redTeamPath,
-    timeline: redTeamTimeline,
-    metrics: redTeamMetrics,
-    logLines: redTeamLogLines,
   }
 
   return (
-    <section className="workspace-section dashboard-content redteam-workspace">
-      <div className="workspace-title-row redteam-header">
+    <section className="workspace-section dashboard-content">
+      <div className="workspace-title-row">
         <div>
           <h1 className="section-heading app-heading">Red Team Simulator</h1>
           <p className="section-subtitle">
-            Active Session: {simulationData.sessionTitle} {simulationData.ttr ? `• TTR: ${simulationData.ttr}` : ''}
+            Simulate sophisticated multi-stage attacks using network vulnerabilities and local LLM.
           </p>
         </div>
-
-        <div className="redteam-actions">
-          <button className="control-chip secondary-chip" type="button">
-            Terminate
-          </button>
-          <button className="new-simulation generate-button" type="button" onClick={runSimulation}>
-            {isLoading ? 'Executing...' : 'Execute Next Step'}
-            <span className="material-symbols-outlined" aria-hidden="true">play_arrow</span>
+        <div style={{ marginLeft: 'auto' }}>
+          <button
+            className="new-simulation generate-button"
+            onClick={handleSimulate}
+            disabled={isLoading}
+            style={{ cursor: 'pointer' }}
+          >
+            {isLoading ? 'Simulating...' : 'Run Simulation ⚡'}
           </button>
         </div>
       </div>
 
-      {error ? <p className="path-note" style={{ color: '#b91c1c' }}>{error}</p> : null}
+      {error && <p style={{ color: 'var(--danger)', padding: '0 1rem' }}>{error}</p>}
 
-      <SectionCard
-        icon={{ name: 'hub', tone: 'is-secondary' }}
-        title="Network Topology Configuration"
-        action={
-          <div className="path-legend redteam-legend">
-            <div className="legend-item">
-              <span className="legend-dot is-secondary" aria-hidden="true" />
-              <span className="small-label">12 Protected</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-dot is-danger pulse-dot" aria-hidden="true" />
-              <span className="small-label">2 Compromised</span>
-            </div>
+      <div className="dashboard-grid">
+        <section className="surface-card">
+          <div className="card-header">
+            <h2 className="card-title app-heading">Active Attack Chain Simulation</h2>
+            {chain.length > 0 && (
+              <button
+                className="control-chip"
+                style={{ background: 'var(--primary)', color: '#fff', cursor: 'pointer' }}
+                onClick={() => setActiveView('countermeasures')}
+              >
+                Send to Defensive Response 🛡️
+              </button>
+            )}
           </div>
-        }
-      >
-        <div className="topology-shell">
-          <div className="topology-row">
-            {simulationData.topologyNodes.map((node, index) => (
-              <div className="topology-item" key={node.label}>
-                <PathNode node={node} />
-                {index < simulationData.topologyNodes.length - 1 ? <div className="topology-link" aria-hidden="true" /> : null}
+          <div className="card-body">
+            {chain.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '3.5rem' }}>terminal</span>
+                <p>No active attack simulation has been run yet. Run the simulation to view the timeline.</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </SectionCard>
-
-      <div className="redteam-grid">
-        <div className="redteam-main">
-          <div className="redteam-switcher">
-            <div className="switcher-item">
-              <span className="legend-dot is-primary" aria-hidden="true" />
-              <span className="small-label">Red Attack</span>
-            </div>
-            <div className="switcher-item">
-              <span className="legend-dot is-secondary" aria-hidden="true" />
-              <span className="small-label">Blue Defense</span>
-            </div>
-            <span className="switcher-note">Sorted by Chronology</span>
-          </div>
-
-          <div className="timeline-list">
-            {simulationData.timeline.map((item) => (
-              <TimelineItem key={`${item.phase}-${item.time}`} item={item} />
-            ))}
-          </div>
-        </div>
-
-        <aside className="redteam-sidebar">
-          <SectionCard icon={{ name: 'analytics', tone: 'is-primary' }} title="Impact Assessment">
-            <div className="metric-stack">
-              {simulationData.metrics.map((metric) => (
-                <MetricBar key={metric.label} {...metric} />
-              ))}
-            </div>
-          </SectionCard>
-
-          <SectionCard icon={{ name: 'settings', tone: 'is-secondary' }} title="Scenario Parameters">
-            <div className="scenario-stack">
-              {redTeamControls.map((control) => (
-                <div className="scenario-control" key={control.label}>
-                  <label className="scenario-label app-heading">{control.label}</label>
-                  {control.type === 'select' ? (
-                    <select
-                      className="scenario-select"
-                      onChange={(event) => setActorProfile(event.target.value)}
-                      value={actorProfile}
-                    >
-                      <option>{control.value}</option>
-                      <option>Lazarus Group</option>
-                      <option>Fin7 / Carbanak</option>
-                    </select>
-                  ) : control.type === 'range' ? (
-                    <div className="range-shell">
-                      <input
-                        className="scenario-range"
-                        onChange={(event) => setAttackVelocity(Number(event.target.value))}
-                        type="range"
-                        value={attackVelocity}
-                      />
-                      <div className="range-labels">
-                        <span>Stealthy</span>
-                        <span>Real-time</span>
-                        <span>Fast</span>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1rem 0' }}>
+                {chain.map((step, idx) => (
+                  <div key={idx} style={{ display: 'flex', gap: '1rem', borderLeft: '2px solid var(--primary)', paddingLeft: '1.5rem', position: 'relative' }}>
+                    <div style={{
+                      position: 'absolute',
+                      left: '-7px',
+                      top: '0',
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: 'var(--primary)'
+                    }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <span className="severity-pill critical" style={{ fontSize: '0.75rem', padding: '2px 6px' }}>{step.phase}</span>
+                        <span className="tag-chip" style={{ background: '#f1f5f9', color: '#475569', fontSize: '0.75rem', borderRadius: '4px', padding: '2px 6px' }}>{step.mitre_id}</span>
+                        <strong className="app-heading" style={{ fontSize: '0.9rem' }}>{step.technique}</strong>
+                      </div>
+                      <p style={{ margin: '0.5rem 0', fontSize: '0.85rem', color: 'var(--text-strong)' }}>{step.description}</p>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        Path: <strong>{step.src_node}</strong> ➔ <strong>{step.dst_node}</strong>
                       </div>
                     </div>
-                  ) : (
-                    <label className="toggle-shell">
-                      <input
-                        checked={autoGeneratePlaybook}
-                        onChange={(event) => setAutoGeneratePlaybook(event.target.checked)}
-                        type="checkbox"
-                      />
-                      <span>Auto-generate Playbook</span>
-                    </label>
-                  )}
-                </div>
-              ))}
-            </div>
-          </SectionCard>
-
-          <SectionCard icon={{ name: 'terminal', tone: 'is-danger' }} title="Live Log">
-            <div className="live-log">
-              <div className="live-log-head">
-                <span className="small-label">Terminal Output</span>
-                <span className="live-pill">
-                  <span className="live-dot" /> Live
-                </span>
-              </div>
-              <div className="live-log-body">
-                {simulationData.logLines.map((line) => (
-                  <p className={`log-line tone-${line.tone}`} key={line.text}>
-                    {line.text}
-                  </p>
+                  </div>
                 ))}
-                <p className="log-line caret">_</p>
               </div>
-            </div>
-          </SectionCard>
-        </aside>
+            )}
+          </div>
+        </section>
       </div>
-
-      <button className="redteam-fab" type="button" aria-label="Open analytics">
-        <span className="material-symbols-outlined" aria-hidden="true">analytics</span>
-      </button>
     </section>
   )
 }
