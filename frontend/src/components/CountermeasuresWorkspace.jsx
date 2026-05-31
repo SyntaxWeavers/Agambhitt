@@ -48,7 +48,7 @@ export function CountermeasuresWorkspace({ attackChain }) {
             disabled={isLoading || attackChain.length === 0}
             style={{ cursor: 'pointer' }}
           >
-            {isLoading ? 'Generating...' : 'Analyze Defensive Controls ⚡'}
+            {isLoading ? 'Generating...' : 'Analyze Defensive Controls'}
           </button>
         </div>
       </div>

@@ -1,22 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 :root {
-  --bg-soft: #0a0e17; /* Dark space background */
-  --surface: #121824; /* Card base */
-  --surface-soft: rgba(18, 24, 36, 0.75); /* Translucent layers */
-  --text-strong: #f1f5f9; /* High-contrast white */
-  --text-muted: #94a3b8; /* Medium-contrast gray */
-  --primary: #00f2ff; /* Electric Cyan */
-  --primary-glow: rgba(0, 242, 255, 0.15);
-  --accent: #8a2be2; /* Digital Violet */
-  --danger: #ef4444; /* Threat red */
-  --success: #10b981; /* Safe green */
-  --border-color: rgba(148, 163, 184, 0.12); /* Faint structural lines */
+  --bg-soft: #eef5ff;
+  --surface: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.78);
+  --text-strong: #0f1f33;
+  --text-muted: #54637b;
   --sidebar-width: 18rem;
-  
-  --heading-font: 'Inter', sans-serif;
-  --body-font: 'Inter', sans-serif;
+  --heading-font: 'Hanken Grotesk', sans-serif;
+  --body-font: 'Hanken Grotesk', sans-serif;
   --mono-font: 'JetBrains Mono', monospace;
 
   font-family: var(--body-font);
@@ -30,6 +23,7 @@
 
 * {
   box-sizing: border-box;
+  border-radius: 0px !important;
 }
 
 html {
@@ -71,132 +65,4 @@ textarea {
 .app-heading {
   font-family: var(--heading-font);
   letter-spacing: -0.04em;
-}
-
-/* --- Dark Mode & Premium Overrides --- */
-
-body {
-  background-color: var(--bg-soft) !important;
-  color: var(--text-strong) !important;
-}
-
-.dashboard-shell {
-  background: radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.08), transparent 45%),
-              radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.06), transparent 45%),
-              var(--bg-soft) !important;
-}
-
-.surface-card,
-.workspace-card,
-.topbar-card,
-.sidebar-card {
-  background: rgba(18, 24, 36, 0.75) !important;
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
-}
-
-.card-header {
-  border-bottom: 1px solid var(--border-color) !important;
-  background: linear-gradient(180deg, rgba(22, 30, 49, 0.8), rgba(18, 24, 36, 0.9)) !important;
-}
-
-.card-title {
-  color: var(--text-strong) !important;
-}
-
-.text-editor {
-  background: rgba(10, 14, 23, 0.6) !important;
-  border: 1px solid var(--border-color) !important;
-  color: #38bdf8 !important;
-  padding: 1rem;
-}
-
-.text-editor:focus {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px var(--primary-glow) !important;
-}
-
-.vector-card {
-  background: rgba(10, 14, 23, 0.4) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 0.75rem !important;
-}
-
-.vector-card:hover {
-  border-color: var(--primary) !important;
-  box-shadow: 0 8px 30px var(--primary-glow) !important;
-}
-
-.vector-title {
-  color: var(--text-strong) !important;
-}
-
-.vector-desc, .body-copy, .muted-copy, .meta-copy, .label-copy {
-  color: var(--text-muted) !important;
-}
-
-.control-chip {
-  background: rgba(30, 41, 59, 0.8) !important;
-  color: var(--text-strong) !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 6px !important;
-  font-weight: 500 !important;
-  transition: all 150ms ease;
-}
-
-.control-chip:hover {
-  background: rgba(51, 65, 85, 0.8) !important;
-  border-color: var(--primary) !important;
-}
-
-/* Sidebar & Navigation */
-.nav-link {
-  color: var(--text-muted) !important;
-  border-radius: 6px !important;
-  transition: all 150ms ease;
-}
-
-.nav-link:hover, .nav-link.is-active {
-  color: var(--primary) !important;
-  background: rgba(0, 242, 255, 0.08) !important;
-}
-
-.new-simulation {
-  background: var(--primary) !important;
-  color: #020617 !important;
-  font-weight: 700;
-  border-radius: 6px !important;
-  box-shadow: 0 4px 20px var(--primary-glow) !important;
-}
-
-.new-simulation:hover {
-  opacity: 0.9;
-}
-
-/* Audit Log Table */
-.audit-table th {
-  color: var(--text-muted) !important;
-  border-bottom: 2px solid var(--border-color) !important;
-}
-
-.audit-row {
-  border-bottom: 1px solid var(--border-color) !important;
-  transition: background 150ms ease;
-}
-
-.audit-row:hover {
-  background: rgba(255, 255, 255, 0.02) !important;
-}
-
-/* Path Nodes styling */
-.path-node {
-  background: rgba(18, 24, 36, 0.8) !important;
-  border: 1px solid var(--border-color) !important;
-}
-
-pre {
-  background: rgba(10, 14, 23, 0.8) !important;
-  border: 1px solid var(--border-color) !important;
-  color: #60a5fa !important;
 }

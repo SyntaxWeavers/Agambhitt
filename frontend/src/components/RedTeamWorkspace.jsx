@@ -43,7 +43,7 @@ export function RedTeamWorkspace({
             disabled={isLoading}
             style={{ cursor: 'pointer' }}
           >
-            {isLoading ? 'Simulating...' : 'Run Simulation ⚡'}
+            {isLoading ? 'Simulating...' : 'Run Simulation'}
           </button>
         </div>
       </div>
@@ -60,7 +60,7 @@ export function RedTeamWorkspace({
                 style={{ background: 'var(--primary)', color: '#fff', cursor: 'pointer' }}
                 onClick={() => setActiveView('countermeasures')}
               >
-                Send to Defensive Response 🛡️
+                Send to Defensive Response
               </button>
             )}
           </div>

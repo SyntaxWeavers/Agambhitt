@@ -59,7 +59,7 @@ export function PlaybookWorkspace({ selectedVector, setSelectedVector }) {
                 disabled={isLoading || !selectedVector}
                 style={{ cursor: 'pointer', background: 'var(--primary)', color: '#fff' }}
               >
-                {isLoading ? 'Generating...' : 'Generate Playbook ⚡'}
+                {isLoading ? 'Generating...' : 'Generate Playbook'}
               </button>
             </div>
             <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

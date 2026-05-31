@@ -86,7 +86,7 @@ export function AttackWorkspace({
                   disabled={isLoading}
                   style={{ cursor: 'pointer', background: 'var(--primary)', color: '#fff' }}
                 >
-                  {isLoading ? 'Analyzing...' : 'Run Analysis ⚡'}
+                  {isLoading ? 'Analyzing...' : 'Run Analysis'}
                 </button>
               </div>
             </div>

@@ -41,7 +41,7 @@ export function AuditHistoryWorkspace() {
             disabled={isLoading}
             style={{ cursor: 'pointer' }}
           >
-            {isLoading ? 'Refreshing...' : 'Refresh Logs 🔄'}
+            {isLoading ? 'Refreshing...' : 'Refresh Logs'}
           </button>
         </div>
       </div>
