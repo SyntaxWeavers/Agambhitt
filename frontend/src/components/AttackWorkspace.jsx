@@ -4,41 +4,48 @@ import { fetchAnalyze } from '../lib/agambhittApi.js'
 export function AttackWorkspace({
   topology,
   setTopology,
-  vulnerabilities,
-  setVulnerabilities,
-  incidents,
-  setIncidents,
   setSelectedVector,
   setActiveView
 }) {
   const [topologyStr, setTopologyStr] = useState(JSON.stringify(topology, null, 2))
-  const [vulnStr, setVulnStr] = useState(JSON.stringify(vulnerabilities, null, 2))
-  const [incidentsStr, setIncidentsStr] = useState(JSON.stringify(incidents, null, 2))
-  
   const [attackVectors, setAttackVectors] = useState([])
   const [graphNodes, setGraphNodes] = useState([])
   const [graphEdges, setGraphEdges] = useState([])
-  
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result)
+        if (!json.nodes || !json.edges) {
+          setError('Invalid format. JSON must contain "nodes" and "edges" keys.')
+          return
+        }
+        setTopology(json)
+        setTopologyStr(JSON.stringify(json, null, 2))
+        setError('')
+      } catch (err) {
+        setError('Failed to parse JSON file.')
+      }
+    }
+    reader.readAsText(file)
+  }
 
   const handleAnalyze = async () => {
     setIsLoading(true)
     setError('')
     try {
       const parsedTopology = JSON.parse(topologyStr)
-      const parsedVulns = JSON.parse(vulnStr)
-      const parsedIncidents = JSON.parse(incidentsStr)
-
-      // Save to parent state for sharing
       setTopology(parsedTopology)
-      setVulnerabilities(parsedVulns)
-      setIncidents(parsedIncidents)
 
       const result = await fetchAnalyze({
         topology: parsedTopology,
-        vulnerabilities: parsedVulns,
-        historical_incidents: parsedIncidents,
+        vulnerabilities: [],
+        historical_incidents: [],
       })
 
       setAttackVectors(result.attack_vectors || [])
@@ -57,55 +64,41 @@ export function AttackWorkspace({
         <div>
           <h1 className="section-heading app-heading">Attack Predictor</h1>
           <p className="section-subtitle">
-            Analyze network topology and vulnerabilities using NetworkX and granite4.1:3b.
+            Upload or paste network topology data to predict likely attack paths using granite4.1:3b.
           </p>
         </div>
       </div>
 
       <div className="dashboard-grid">
-        {/* Input Forms */}
         <div className="panel-grid">
+          {/* Topology Input & Upload */}
           <section className="surface-card">
             <div className="card-header">
-              <h2 className="card-title app-heading">Network Configuration</h2>
-              <button 
-                className="control-chip" 
-                onClick={handleAnalyze} 
-                disabled={isLoading}
-                style={{ cursor: 'pointer', background: 'var(--primary)', color: '#fff' }}
-              >
-                {isLoading ? 'Analyzing...' : 'Run Analysis ⚡'}
-              </button>
+              <h2 className="card-title app-heading">Network Topology</h2>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <label className="control-chip" style={{ cursor: 'pointer', background: '#f1f5f9', border: '1px solid #cbd5e1' }}>
+                  Upload JSON
+                  <input type="file" accept=".json" onChange={handleFileUpload} style={{ display: 'none' }} />
+                </label>
+                <button 
+                  className="control-chip" 
+                  onClick={handleAnalyze} 
+                  disabled={isLoading}
+                  style={{ cursor: 'pointer', background: 'var(--primary)', color: '#fff' }}
+                >
+                  {isLoading ? 'Analyzing...' : 'Run Analysis ⚡'}
+                </button>
+              </div>
             </div>
-            <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div>
-                <label className="small-label">Topology JSON</label>
-                <textarea
-                  className="text-editor"
-                  style={{ minHeight: '10rem', fontFamily: 'monospace', fontSize: '0.85rem' }}
-                  value={topologyStr}
-                  onChange={(e) => setTopologyStr(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="small-label">Vulnerabilities JSON</label>
-                <textarea
-                  className="text-editor"
-                  style={{ minHeight: '8rem', fontFamily: 'monospace', fontSize: '0.85rem' }}
-                  value={vulnStr}
-                  onChange={(e) => setVulnStr(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="small-label">Incidents JSON</label>
-                <textarea
-                  className="text-editor"
-                  style={{ minHeight: '6rem', fontFamily: 'monospace', fontSize: '0.85rem' }}
-                  value={incidentsStr}
-                  onChange={(e) => setIncidentsStr(e.target.value)}
-                />
-              </div>
-              {error && <p style={{ color: 'var(--danger)', margin: 0 }}>{error}</p>}
+            <div className="card-body">
+              <label className="small-label">Topology JSON (must contain nodes and edges)</label>
+              <textarea
+                className="text-editor"
+                style={{ minHeight: '26rem', fontFamily: 'monospace', fontSize: '0.85rem' }}
+                value={topologyStr}
+                onChange={(e) => setTopologyStr(e.target.value)}
+              />
+              {error && <p style={{ color: 'var(--danger)', marginTop: '0.5rem', marginBottom: 0 }}>{error}</p>}
             </div>
           </section>
 
@@ -115,11 +108,11 @@ export function AttackWorkspace({
               <h2 className="card-title app-heading">Predicted Attack Vectors</h2>
               <span className="count-pill">{attackVectors.length} Found</span>
             </div>
-            <div className="card-body" style={{ overflowY: 'auto', maxHeight: '42rem' }}>
+            <div className="card-body" style={{ overflowY: 'auto', maxHeight: '31rem' }}>
               {attackVectors.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
+                <div style={{ textAlign: 'center', padding: '5rem 1rem', color: 'var(--text-muted)' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '3rem' }}>shield</span>
-                  <p>No attack vectors predicted yet. Configure inputs and run analysis.</p>
+                  <p>No attack vectors predicted yet. Upload a topology JSON (like `to_use.json`) and run analysis.</p>
                 </div>
               ) : (
                 <div className="vector-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -163,10 +156,10 @@ export function AttackWorkspace({
         {graphNodes.length > 0 && (
           <section className="surface-card">
             <div className="card-header">
-              <h2 className="card-title app-heading">Topology Connections & Paths</h2>
+              <h2 className="card-title app-heading">Topology Nodes & Connections</h2>
             </div>
             <div className="card-body">
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '0.75rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '0.75rem', maxHeight: '12rem', overflowY: 'auto' }}>
                 {graphNodes.map(node => (
                   <div key={node.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fff', padding: '0.5rem 0.75rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
                     <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>
@@ -180,8 +173,8 @@ export function AttackWorkspace({
                 ))}
               </div>
               <div style={{ marginTop: '1rem' }}>
-                <h4 className="app-heading" style={{ fontSize: '0.95rem', marginBottom: '0.5rem' }}>Active Traffic Flows:</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                <h4 className="app-heading" style={{ fontSize: '0.95rem', marginBottom: '0.5rem' }}>Active Traffic Flows (Total: {graphEdges.length}):</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem', maxHeight: '12rem', overflowY: 'auto' }}>
                   {graphEdges.map((edge, idx) => (
                     <div key={idx} style={{ fontSize: '0.8rem', padding: '0.5rem', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '0.25rem' }}>
                       <strong>{edge.source}</strong> ➔ <strong>{edge.target}</strong>

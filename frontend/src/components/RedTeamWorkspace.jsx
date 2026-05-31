@@ -3,7 +3,6 @@ import { fetchRedTeam } from '../lib/agambhittApi.js'
 
 export function RedTeamWorkspace({
   topology,
-  vulnerabilities,
   setAttackChain,
   setActiveView
 }) {
@@ -17,7 +16,7 @@ export function RedTeamWorkspace({
     try {
       const response = await fetchRedTeam({
         topology: topology,
-        vulnerabilities: vulnerabilities
+        vulnerabilities: []
       })
       setChain(response.attack_chain || [])
       setAttackChain(response.attack_chain || [])
@@ -34,7 +33,7 @@ export function RedTeamWorkspace({
         <div>
           <h1 className="section-heading app-heading">Red Team Simulator</h1>
           <p className="section-subtitle">
-            Simulate sophisticated multi-stage attacks using network vulnerabilities and local LLM.
+            Simulate sophisticated multi-stage attacks using the active topology and local LLM.
           </p>
         </div>
         <div style={{ marginLeft: 'auto' }}>
