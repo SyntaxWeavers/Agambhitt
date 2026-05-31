@@ -54,10 +54,10 @@ export function PlaybookWorkspace({ selectedVector, setSelectedVector }) {
             <div className="card-header">
               <h2 className="card-title app-heading">Input Context</h2>
               <button
-                className="control-chip"
+                className="new-simulation"
                 onClick={handleGenerate}
                 disabled={isLoading || !selectedVector}
-                style={{ cursor: 'pointer', background: 'var(--primary)', color: '#fff' }}
+                style={{ cursor: 'pointer', padding: '0.55rem 0.9rem', width: 'auto' }}
               >
                 {isLoading ? 'Generating...' : 'Generate Playbook'}
               </button>

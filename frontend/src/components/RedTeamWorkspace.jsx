@@ -56,8 +56,8 @@ export function RedTeamWorkspace({
             <h2 className="card-title app-heading">Active Attack Chain Simulation</h2>
             {chain.length > 0 && (
               <button
-                className="control-chip"
-                style={{ background: 'var(--primary)', color: '#fff', cursor: 'pointer' }}
+                className="new-simulation"
+                style={{ cursor: 'pointer', padding: '0.55rem 0.9rem', width: 'auto' }}
                 onClick={() => setActiveView('countermeasures')}
               >
                 Send to Defensive Response

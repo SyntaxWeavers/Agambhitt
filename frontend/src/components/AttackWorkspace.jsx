@@ -134,12 +134,12 @@ export function AttackWorkspace({
                   <input type="file" accept=".json" onChange={handleFileUpload} style={{ display: 'none' }} />
                 </label>
                 <button 
-                  className="control-chip" 
+                  className="new-simulation" 
                   onClick={handleAnalyze} 
                   disabled={isLoading}
-                  style={{ cursor: 'pointer', background: 'var(--primary)', color: '#fff' }}
+                  style={{ cursor: 'pointer', padding: '0.55rem 0.9rem', width: 'auto' }}
                 >
-                  {isLoading ? 'Analyzing...' : 'Run Analysis ⚡'}
+                  {isLoading ? 'Analyzing...' : 'Run Analysis'}
                 </button>
               </div>
             </div>
